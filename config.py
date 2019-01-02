@@ -1,3 +1,4 @@
+import os
 from _private_.telegram_key import CFG_TELEGRAM_KEY
 
 class Config:
@@ -17,5 +18,10 @@ class LocalConfig(Config):
     CONTEXT = None
     WH_URL = "https://127.0.0.1:5000/"
 
-# config = Config
-# config = LocalConfig
+
+cfg = Config 
+
+print("ENV", os.getenv('ENV'))
+
+if os.getenv('ENV')=='Local':
+    cfg = LocalConfig    

@@ -7,20 +7,22 @@ import json
 # from telegram.ext import Updater, CommandHandler, MessageHandler, Filters
 # import vk
 import random
-from config import Config
+from config import cfg
+
+print(cfg)
 
 
 app = Flask(__name__,  static_url_path='')
 
 
 def tele_send_message(chat_id, **kwargs):
-    url = Config.URL + 'sendMessage'
+    url = cfg.URL + 'sendMessage'
     answer = {'chat_id': chat_id, **kwargs}
     r = requests.post(url, json=answer)
     return r.json()
 
 def tele_send_photo(chat_id, **kwargs):
-    url = Config.URL + 'sendPhoto'
+    url = cfg.URL + 'sendPhoto'
     answer = {'chat_id': chat_id, **kwargs}
     r = requests.post(url, json=answer)
     return r.json()
@@ -38,7 +40,7 @@ def write_json(data, filename='answer.json'):
 @app.route(f'/set_wh', methods=['POST', 'GET'])
 def tele_set_wh():
     print("Setting: wh")
-    url = Config.URL + "setWebhook?url=" + Config.WH_URL
+    url = cfg.URL + "setWebhook?url=" + cfg.WH_URL
     print(url)
     r = requests.get(url)
     return str(r.json())
@@ -46,14 +48,14 @@ def tele_set_wh():
 @app.route(f'/get_wh', methods=['POST', 'GET'])
 def tele_get_wh_info():
     print("Getting: wh")
-    url = Config.URL + "getWebhookInfo"
+    url = cfg.URL + "getWebhookInfo"
     print(url)
     r = requests.get(url)
     return str(r.json())
 
 @app.route(f'/del_wh', methods=['POST', 'GET'])
 def tele_del_wh():
-    r = requests.get(Config.URL + "deleteWebhook")
+    r = requests.get(cfg.URL + "deleteWebhook")
     return str(r.json())
 
 @app.route('/off', methods=['POST', 'GET'])
@@ -100,4 +102,4 @@ def index():
     return '!',200
 
 if __name__ == "__main__":
-    app.run(host=Config.HOST, port=Config.PORT, debug=Config.PORT, ssl_context=Config.CONTEXT)
+    app.run(host=cfg.HOST, port=cfg.PORT, debug=cfg.PORT, ssl_context=cfg.CONTEXT)
