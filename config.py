@@ -3,12 +3,12 @@ from _private_.telegram_key import CFG_TELEGRAM_KEY
 
 class Config:
     TELEGRAM_KEY = CFG_TELEGRAM_KEY
-    LOCAL_PATH = '/root/tele_tec_bot'
+    LOCAL_PATH = 'root/tele_tec_bot'
     HOST = "0.0.0.0"
     PORT     = "443"
     DEBUG = True
-    CERT     = f'/{LOCAL_PATH}/bundle.crt' 
-    CERT_KEY = f'/{LOCAL_PATH}/certificate.key' 
+    CERT     = f'/{LOCAL_PATH}/_private_/bundle.crt' 
+    CERT_KEY = f'/{LOCAL_PATH}/_private_/certificate.key' 
     CONTEXT = (CERT, CERT_KEY)
     URL = f'https://api.telegram.org/bot{TELEGRAM_KEY}/'
     WH_URL = 'https://eva-bot.ru/'

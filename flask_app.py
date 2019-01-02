@@ -9,7 +9,7 @@ import json
 import random
 from config import cfg
 
-print(cfg)
+print(cfg.__dict__)
 
 
 app = Flask(__name__,  static_url_path='')
