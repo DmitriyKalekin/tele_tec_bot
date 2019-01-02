@@ -7,23 +7,23 @@ import json
 # from telegram.ext import Updater, CommandHandler, MessageHandler, Filters
 # import vk
 import random
-from config import *
-
+from config import Config
 
 
 app = Flask(__name__,  static_url_path='')
 
 
 def tele_send_message(chat_id, **kwargs):
-    url = URL + 'sendMessage'
+    url = Config.URL + 'sendMessage'
     answer = {'chat_id': chat_id, **kwargs}
     r = requests.post(url, json=answer)
     return r.json()
 
 def tele_send_photo(chat_id, **kwargs):
-    url = URL + 'sendPhoto'
+    url = Config.URL + 'sendPhoto'
     answer = {'chat_id': chat_id, **kwargs}
-    r = requests.post(
+    r = requests.post(url, json=answer)
+    return r.json()
 
 
 # @app.route(f'/img/<path:path>')
@@ -38,7 +38,7 @@ def write_json(data, filename='answer.json'):
 @app.route(f'/set_wh', methods=['POST', 'GET'])
 def tele_set_wh():
     print("Setting: wh")
-    url = URL + "setWebhook?url=" + WH_URL
+    url = Config.URL + "setWebhook?url=" + Config.WH_URL
     print(url)
     r = requests.get(url)
     return str(r.json())
@@ -46,14 +46,14 @@ def tele_set_wh():
 @app.route(f'/get_wh', methods=['POST', 'GET'])
 def tele_get_wh_info():
     print("Getting: wh")
-    url = URL + "getWebhookInfo"
+    url = Config.URL + "getWebhookInfo"
     print(url)
     r = requests.get(url)
     return str(r.json())
 
 @app.route(f'/del_wh', methods=['POST', 'GET'])
 def tele_del_wh():
-    r = requests.get(URL + "deleteWebhook")
+    r = requests.get(Config.URL + "deleteWebhook")
     return str(r.json())
 
 @app.route('/off', methods=['POST', 'GET'])
@@ -70,41 +70,34 @@ def index():
     print("ok_here")
     if request.method=='POST':
         r = request.get_json()
+        print(r)
 
-        chat_id = None
-        message = None
-        callback_data = {}
+        # chat_id = None
+        # message = None
+        # callback_data = {}
 
-        if "callback_query" in r:
-            chat_id = r["callback_query"]["message"]["chat"]["id"]
-            callback_data = json.loads(r["callback_query"]["data"])
-            message = "/callback"
+        # if "callback_query" in r:
+        #     chat_id = r["callback_query"]["message"]["chat"]["id"]
+        #     callback_data = json.loads(r["callback_query"]["data"])
+        #     message = "/callback"
 
-        if "message" in r:
-            chat_id = r["message"]["chat"]["id"] # в какой чат
-            message = r["message"]["text"]       # сообщение пользователя
+        # if "message" in r:
+        #     chat_id = r["message"]["chat"]["id"] # в какой чат
+        #     message = r["message"]["text"]       # сообщение пользователя
 
-        if chat_id not in session or message=="/restart":
-            session[chat_id] = {"loc": "start", "inv": {}, "room_seen": ""}
+        # if chat_id not in session or message=="/restart":
+        #     session[chat_id] = {"loc": "start", "inv": {}, "room_seen": ""}
         
-        if not session[chat_id]["loc"]:
-            session[chat_id]["loc"] = "start"
+        # if not session[chat_id]["loc"]:
+        #     session[chat_id]["loc"] = "start"
 
-        if message:
-            if message == "/callback":
-                session[chat_id]["loc"] = callback_data["loc"]
+        # if message:
+        #     if message == "/callback":
+        #         session[chat_id]["loc"] = callback_data["loc"]
             
-            root(session[chat_id]["loc"], chat_id, message)
+        #     root(session[chat_id]["loc"], chat_id, message)
     
     return '!',200
 
-
-
-
-
-
 if __name__ == "__main__":
-    if CFG_LOCAL:
-        app.run(host="0.0.0.0", port="5000", debug=True)
-    else:        
-        app.run(host="0.0.0.0", port=PORT, debug=True, ssl_context=CONTEXT)
+    app.run(host=Config.HOST, port=Config.PORT, debug=Config.PORT, ssl_context=Config.CONTEXT)
