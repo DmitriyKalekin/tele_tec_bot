@@ -1,2 +1,4 @@
-# games-telegram-detective teletec-bot
+# tele_tec_bot
 Telegram text game
+
+
