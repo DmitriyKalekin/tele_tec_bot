@@ -4,27 +4,38 @@ import requests
 # from apiai import ApiAI
 import json
 # import telegram
-from telegram.ext import Updater, CommandHandler, MessageHandler, Filters
+# from telegram.ext import Updater, CommandHandler, MessageHandler, Filters
 # import vk
 import random
 from config import *
 
 
 
-from game import root, session, tele_send_message, tele_send_photo
-# import logging
-
 app = Flask(__name__,  static_url_path='')
 
 
+def tele_send_message(chat_id, **kwargs):
+    url = URL + 'sendMessage'
+    answer = {'chat_id': chat_id, **kwargs}
+    r = requests.post(url, json=answer)
+    return r.json()
+
+def tele_send_photo(chat_id, **kwargs):
+    url = URL + 'sendPhoto'
+    answer = {'chat_id': chat_id, **kwargs}
+    r = requests.post(
 
 
+# @app.route(f'/img/<path:path>')
+# def send_js(path):
+#     return send_from_directory('img', path)
 
-@app.route('/img/<path:path>')
-def send_js(path):
-    return send_from_directory('img', path)
+def write_json(data, filename='answer.json'):
+    with open(filename, 'w') as f:
+        json.dump(data, f, indent=2, ensure_ascii=False)
 
-@app.route('/set_wh', methods=['POST', 'GET'])
+#-------------------------------- WEBHOOKS ---------------------------------------
+@app.route(f'/set_wh', methods=['POST', 'GET'])
 def tele_set_wh():
     print("Setting: wh")
     url = URL + "setWebhook?url=" + WH_URL
@@ -32,7 +43,7 @@ def tele_set_wh():
     r = requests.get(url)
     return str(r.json())
 
-@app.route('/get_wh', methods=['POST', 'GET'])
+@app.route(f'/get_wh', methods=['POST', 'GET'])
 def tele_get_wh_info():
     print("Getting: wh")
     url = URL + "getWebhookInfo"
@@ -40,29 +51,21 @@ def tele_get_wh_info():
     r = requests.get(url)
     return str(r.json())
 
-
-
-
-
-@app.route('/del_wh', methods=['POST', 'GET'])
+@app.route(f'/del_wh', methods=['POST', 'GET'])
 def tele_del_wh():
     r = requests.get(URL + "deleteWebhook")
     return str(r.json())
 
-
-@app.route('/url', methods=['POST', 'GET'])
-def url_():
-    print("URL pressed")
-    return "!", 200
-
-@app.route('/callback', methods=['POST', 'GET'])
-def callback_():
-    print("callback pressed")
-    return "!", 200
-
+@app.route('/off', methods=['POST', 'GET'])
+def shutdown():
+    func = request.environ.get('werkzeug.server.shutdown')
+    if func is None:
+        raise RuntimeError('Not running with the Werkzeug Server')
+    func()
+    return 'Server shutting down...'
 
 # --------------------------------------------------------- ADMIN ---------------------------------------------
-@app.route('/', methods=['POST', 'GET'])
+@app.route(f'/', methods=['POST', 'GET'])
 def index():
     print("ok_here")
     if request.method=='POST':
@@ -95,17 +98,9 @@ def index():
     
     return '!',200
 
-@app.route('/off', methods=['POST', 'GET'])
-def shutdown():
-    func = request.environ.get('werkzeug.server.shutdown')
-    if func is None:
-        raise RuntimeError('Not running with the Werkzeug Server')
-    func()
-    return 'Server shutting down...'
 
-def write_json(data, filename='answer.json'):
-    with open(filename, 'w') as f:
-        json.dump(data, f, indent=2, ensure_ascii=False)
+
+
 
 
 if __name__ == "__main__":
