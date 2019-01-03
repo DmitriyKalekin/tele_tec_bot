@@ -8,24 +8,12 @@ import json
 # import vk
 import random
 from config import cfg
-
-print(cfg.__dict__)
-
+from tele_api  import TeleBot
+from commands import CommandsRouter
 
 app = Flask(__name__,  static_url_path='')
 
-
-def tele_send_message(chat_id, **kwargs):
-    url = cfg.URL + 'sendMessage'
-    answer = {'chat_id': chat_id, **kwargs}
-    r = requests.post(url, json=answer)
-    return r.json()
-
-def tele_send_photo(chat_id, **kwargs):
-    url = cfg.URL + 'sendPhoto'
-    answer = {'chat_id': chat_id, **kwargs}
-    r = requests.post(url, json=answer)
-    return r.json()
+session = {}
 
 
 # @app.route(f'/img/<path:path>')
@@ -39,24 +27,15 @@ def write_json(data, filename='answer.json'):
 #-------------------------------- WEBHOOKS ---------------------------------------
 @app.route(f'/set_wh', methods=['POST', 'GET'])
 def tele_set_wh():
-    print("Setting: wh")
-    url = cfg.URL + "setWebhook?url=" + cfg.WH_URL
-    print(url)
-    r = requests.get(url)
-    return str(r.json())
+    return TeleBot.setWebhook(cfg.WH_URL)
 
 @app.route(f'/get_wh', methods=['POST', 'GET'])
 def tele_get_wh_info():
-    print("Getting: wh")
-    url = cfg.URL + "getWebhookInfo"
-    print(url)
-    r = requests.get(url)
-    return str(r.json())
+    return getWebhookInfo()
 
 @app.route(f'/del_wh', methods=['POST', 'GET'])
 def tele_del_wh():
-    r = requests.get(cfg.URL + "deleteWebhook")
-    return str(r.json())
+    return deleteWebhook()
 
 @app.route('/off', methods=['POST', 'GET'])
 def shutdown():
@@ -69,10 +48,38 @@ def shutdown():
 # --------------------------------------------------------- ADMIN ---------------------------------------------
 @app.route(f'/', methods=['POST', 'GET'])
 def index():
-    print("ok_here")
     if request.method=='POST':
         r = request.get_json()
         print(r)
+
+        chat_id = r["message"]["chat"]["id"]
+        message = r["message"]["text"]
+        sender =  r["message"]["from"]["id"]
+
+        if chat_id < 0 and message:
+            CommandsRouter.index(chat_id, message, sender)
+
+            # if chat_id not in session:
+            #     session[chat_id] =  {}
+            #     print("group chat stored")
+
+            # if sender not in session[chat_id]:
+            #     session[chat_id][sender] = {}
+            #     print(f"member {sender} added")
+            #     TeleBot.sendMessage(sender, 'You have added to the Game')
+            
+
+
+
+        # admins = TeleBot.getChatAdministrators(chat_id)
+        # print("admins:")
+        # print(admins)
+        # print(type(admins))
+
+        # print("------------------------------------")
+        # for a in admins:
+            # print(a)
+
 
         # chat_id = None
         # message = None
